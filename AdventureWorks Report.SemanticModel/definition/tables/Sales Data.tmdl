@@ -1,0 +1,132 @@
+table 'Sales Data'
+	lineageTag: 38d81e4e-502b-4b22-b0a8-b6123ddcc95e
+
+	column OrderDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: c46d28cd-ada4-402a-a89e-3a2a0ac79431
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column StockDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 79b7086a-3c2a-40df-a8fa-6a5a86618bb6
+		summarizeBy: none
+		sourceColumn: StockDate
+
+		variation Variation
+			isDefault
+			relationship: ced083ab-5b52-4094-bcdf-7bc9aef3de51
+			defaultHierarchy: LocalDateTable_35239b85-8ff2-46a4-8d77-edfbb90a0e3b.'Date Hierarchy'
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column OrderNumber
+		dataType: string
+		lineageTag: 39530775-0e33-41c9-b92f-57a33dc37d68
+		summarizeBy: none
+		sourceColumn: OrderNumber
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: e701c011-0301-44e3-b9b9-7f7c17da98df
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerKey
+		dataType: int64
+		formatString: 0
+		lineageTag: cfb212a8-dacb-4b5c-8d0b-9cbac46f7abb
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column TerritoryKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 99492e47-2876-4c5b-b907-1a4ff3fce5c4
+		summarizeBy: none
+		sourceColumn: TerritoryKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderLineItem
+		dataType: int64
+		formatString: 0
+		lineageTag: c25bd49c-c8f1-4529-b9ae-8b944d1f8d5c
+		summarizeBy: sum
+		sourceColumn: OrderLineItem
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderQuantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 97f61e0b-0fae-48b5-81c7-4630b4786f45
+		summarizeBy: sum
+		sourceColumn: OrderQuantity
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Quantity Type' =
+			
+			IF(
+			    'Sales Data'[OrderQuantity] > 1,
+			    "Multiple Items",
+			    "Single Item"
+			)
+		dataType: string
+		lineageTag: 5c3c169b-5697-425a-bfb3-c49238f7fb87
+		summarizeBy: none
+		isDataTypeInferred
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Sales Data' = m
+		mode: import
+		source =
+				let
+				    Source = Folder.Files("C:\Users\DELL\OneDrive\Desktop\Anisha Pogade\AdventureWorks+Raw+Data\AdventureWorks Raw Data\Sales Data"),
+				    #"Filtered Hidden Files1" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+				    #"Invoke Custom Function1" = Table.AddColumn(#"Filtered Hidden Files1", "Transform File", each #"Transform File"([Content])),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Invoke Custom Function1", {"Name", "Source.Name"}),
+				    #"Removed Other Columns1" = Table.SelectColumns(#"Renamed Columns1", {"Source.Name", "Transform File"}),
+				    #"Expanded Table Column1" = Table.ExpandTableColumn(#"Removed Other Columns1", "Transform File", Table.ColumnNames(#"Transform File"(#"Sample File"))),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Expanded Table Column1",{{"Source.Name", type text}, {"OrderDate", type date}, {"StockDate", type date}, {"OrderNumber", type text}, {"ProductKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"TerritoryKey", Int64.Type}, {"OrderLineItem", Int64.Type}, {"OrderQuantity", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Source.Name"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

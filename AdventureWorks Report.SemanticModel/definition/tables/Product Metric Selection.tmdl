@@ -1,0 +1,57 @@
+table 'Product Metric Selection'
+	lineageTag: 1da1485a-e74e-44bf-8bb3-6ec7382d596a
+
+	column 'Product Metric Selection'
+		dataType: string
+		lineageTag: c6948f8e-ea30-4fb5-92f0-cd2d018fac68
+		summarizeBy: none
+		isDataTypeInferred
+		sourceColumn: [Value1]
+		sortByColumn: 'Product Metric Selection Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Product Metric Selection Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Metric Selection Fields'
+		dataType: string
+		isHidden
+		lineageTag: 4cbd43d7-c0cd-443a-9add-defa718d7743
+		summarizeBy: none
+		isDataTypeInferred
+		sourceColumn: [Value2]
+		sortByColumn: 'Product Metric Selection Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Metric Selection Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2ade5aa9-20e0-4dc6-bee5-e1cc1586800a
+		summarizeBy: sum
+		isDataTypeInferred
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Product Metric Selection' = calculated
+		mode: import
+		source =
+				{
+				    ("Orders", NAMEOF('Measure Table'[Total Orders]), 0),
+				    ("Returns", NAMEOF('Measure Table'[Total Returns]), 1),
+				    ("Profit", NAMEOF('Measure Table'[Total Profit]), 2),
+				    ("Revenue", NAMEOF('Measure Table'[Total Revenue]), 3),
+				    ("Returns %", NAMEOF('Measure Table'[Returns Rate]), 4)
+				}
+
+	annotation PBI_Id = 5dd23d3b692842f9bf08c4c3d0a69c10
+

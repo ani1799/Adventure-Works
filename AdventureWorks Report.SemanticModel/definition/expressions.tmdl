@@ -1,0 +1,43 @@
+expression Parameter1 = #"Sample File" meta [IsParameterQuery=true, BinaryIdentifier=#"Sample File", Type="Binary", IsParameterQueryRequired=true]
+	lineageTag: 46aea779-fc9a-4d8f-b036-ef1617e3c896
+	queryGroup: 'Transform File from Sales Data\Helper Queries'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transform Sample File' =
+		let
+		    Source = Csv.Document(Parameter1,[Delimiter=",", Columns=8, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+		in
+		    #"Promoted Headers"
+	lineageTag: 3751d6a0-ef6f-411a-b549-e4666228babc
+	queryGroup: 'Transform File from Sales Data'
+
+	annotation PBI_ResultType = Table
+
+expression 'Sample File' =
+		let
+		    Source = Folder.Files("C:\Users\DELL\OneDrive\Desktop\Anisha Pogade\AdventureWorks+Raw+Data\AdventureWorks Raw Data\Sales Data"),
+		    #"C:\Users\DELL\OneDrive\Desktop\Anisha Pogade\AdventureWorks+Raw+Data\AdventureWorks Raw Data\Sales Data\_AdventureWorks Sales Data 2021 csv" = Source{[#"Folder Path"="C:\Users\DELL\OneDrive\Desktop\Anisha Pogade\AdventureWorks+Raw+Data\AdventureWorks Raw Data\Sales Data\",Name="AdventureWorks Sales Data 2021.csv"]}[Content]
+		in
+		    #"C:\Users\DELL\OneDrive\Desktop\Anisha Pogade\AdventureWorks+Raw+Data\AdventureWorks Raw Data\Sales Data\_AdventureWorks Sales Data 2021 csv"
+	lineageTag: f92de7a4-b77b-4596-9ecd-f1385dd812ca
+	queryGroup: 'Transform File from Sales Data\Helper Queries'
+
+	annotation PBI_ResultType = Binary
+
+expression 'Transform File' =
+		let
+		    Source = (Parameter1 as binary) => let
+		    Source = Csv.Document(Parameter1,[Delimiter=",", Columns=8, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+		in
+		    #"Promoted Headers"
+		in
+		    Source
+	mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transform Sample File""}" ]
+	lineageTag: d46b33ae-385f-4453-990f-f00e5c3662df
+	queryGroup: 'Transform File from Sales Data\Helper Queries'
+
+	annotation PBI_ResultType = Function
+

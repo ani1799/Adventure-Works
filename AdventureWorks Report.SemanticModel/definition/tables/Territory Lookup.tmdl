@@ -1,0 +1,77 @@
+table 'Territory Lookup'
+	excludeFromModelRefresh
+	lineageTag: 681a5368-18bc-4a5e-8d51-5e04b298925d
+
+	column SalesTerritoryKey
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 0579dcfe-bcb3-42b6-8adf-91a03c70b112
+		summarizeBy: none
+		sourceColumn: SalesTerritoryKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 9da79b1b-0134-4efe-b161-50bc12c24ba3
+		summarizeBy: none
+		sourceColumn: Region
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 947d7619-4e72-47af-aa74-a74044307c09
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Continent
+		dataType: string
+		lineageTag: f1ae9462-8c4d-4b3f-8c75-7f13f96c804c
+		dataCategory: Continent
+		summarizeBy: none
+		sourceColumn: Continent
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Territory Hierarchy'
+		lineageTag: 02f4763d-da04-45ff-9a09-bc48a9ae43f4
+
+		level Continent
+			lineageTag: a395d1d1-645d-4f97-b2f7-b042a2abd263
+			column: Continent
+
+		level Country
+			lineageTag: c498ede7-2b39-4658-9263-5552f8d575d2
+			column: Country
+
+		level Region
+			lineageTag: 81157349-6b31-4f88-92c9-5650368e9374
+			column: Region
+
+		changedProperty = IsHidden
+
+	partition 'Territory Lookup' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\DELL\OneDrive\Desktop\Anisha Pogade\AdventureWorks+Raw+Data\AdventureWorks Raw Data\AdventureWorks Territory Lookup.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SalesTerritoryKey", Int64.Type}, {"Region", type text}, {"Country", type text}, {"Continent", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,486 @@
+table 'Measure Table'
+	lineageTag: 4357e0f7-5083-4486-a678-e738dd4dab40
+
+	measure 'Quantity Sold' =
+			
+			SUM(
+			    'Sales Data'[OrderQuantity]
+			)
+		formatString: #,0
+		lineageTag: b508f005-1b09-4261-9a6c-8addd827ec73
+
+		changedProperty = IsHidden
+
+	measure 'Quantity Returned' =
+			
+			SUM(
+			    'Returns Data'[ReturnQuantity]
+			)
+		formatString: 0
+		lineageTag: 68516d8d-cd72-4742-b011-6477574bc33d
+
+		changedProperty = IsHidden
+
+	measure 'Average Retail Price' =
+			
+			AVERAGE(
+			    'Product Lookup'[ProductPrice]
+			)
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: 146cfd41-fcf8-4498-b57d-4cac225ae540
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Total Returns' =
+			
+			COUNT(
+			    'Returns Data'[ReturnQuantity]
+			)
+		formatString: #,0
+		lineageTag: 53b826f8-d5f2-4d4d-b79b-20f6f705cb99
+
+		changedProperty = IsHidden
+
+	measure 'Total Orders' =
+			
+			DISTINCTCOUNT(
+			    'Sales Data'[OrderNumber]
+			)
+		formatString: #,0
+		lineageTag: 07614c4e-bf7b-4ade-9ecf-3b4522dc4922
+
+		changedProperty = IsHidden
+
+	measure 'Total Customers' =
+			
+			DISTINCTCOUNT(
+			    'Sales Data'[CustomerKey]
+			)
+		formatString: #,0
+		lineageTag: bcf5aa3a-552a-43d0-9c71-37fbfee0097c
+
+		changedProperty = IsHidden
+
+	measure 'Returns Rate' = ```
+			
+			DIVIDE(
+			    [Quantity Returned], 
+			    [Quantity Sold],
+			    "No Sales"
+			)
+			```
+		formatString: #,0.00%;-#,0.00%;#,0.00%
+		lineageTag: cc077927-f216-4213-a1db-5820d92faddb
+
+		changedProperty = IsHidden
+
+	measure 'Bulk Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    'Sales Data'[OrderQuantity] > 1
+			)
+		formatString: 0
+		lineageTag: d31320d5-8039-45be-83b8-ee3af25d05c2
+
+		changedProperty = IsHidden
+
+	measure 'Weekend Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    'Calendar Lookup'[Weekend] = "Weekend"
+			)
+		formatString: #,0
+		lineageTag: e4be2a2d-129e-4b98-a86d-18e08e10f4ce
+
+		changedProperty = IsHidden
+
+	measure 'Bike Returns' =
+			
+			CALCULATE(
+			     [Total Returns],
+			     'Product Categories Lookup'[CategoryName] = "Bikes"
+			    )
+		formatString: 0
+		lineageTag: a3159c9b-b670-4bbd-a49c-a814a4842655
+
+		changedProperty = IsHidden
+
+	measure 'Bike Sales' =
+			
+			CALCULATE(
+			    [Quantity Sold],
+			    'Product Categories Lookup'[CategoryName] = "Bikes"
+			)
+		formatString: #,0
+		lineageTag: 11e248ef-e4ae-41a5-af98-bf3ff7736580
+
+		changedProperty = IsHidden
+
+	measure 'Bike Return Rate' =
+			
+			CALCULATE(
+			    [Returns Rate],
+			    'Product Categories Lookup'[CategoryName] = "Bikes"
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 18912747-d362-4327-8d55-cb29c1859a2f
+
+		changedProperty = IsHidden
+
+	measure 'All Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    ALL(
+			        'Sales Data'
+			    )
+			)
+		formatString: 0
+		lineageTag: 465baf34-770a-496d-a605-50826ede20f2
+
+		changedProperty = IsHidden
+
+	measure '% of All Orders' =
+			
+			DIVIDE(
+			    [Total Orders],
+			    [All Orders]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 7c79aeed-9873-4186-865c-f7760d22e989
+
+		changedProperty = IsHidden
+
+	measure 'Overall Average Price' =
+			
+			CALCULATE(
+			    [Average Retail Price],
+			    ALL(
+			        'Product Lookup'
+			    )
+			)
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: 5cce152e-c49d-485a-8dc6-cc5e3c9fa3c3
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'All Returns' =
+			
+			CALCULATE(
+			    [Total Returns],
+			    ALL(
+			        'Returns Data'
+			    )
+			)
+		formatString: 0
+		lineageTag: a4ee799e-a65f-4327-8fc9-66ae475f1634
+
+		changedProperty = IsHidden
+
+	measure '% of All Returns' =
+			
+			DIVIDE(
+			    [Total Returns],
+			    [All Returns]
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b67f5296-f781-43ff-acbd-5d858ce84c82
+
+		changedProperty = IsHidden
+
+	measure 'High Ticket Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    FILTER(
+			        'Product Lookup',
+			        'Product Lookup'[ProductPrice] > [Overall Average Price]
+			    )
+			)
+		formatString: #,0
+		lineageTag: ce3672b4-331b-4665-aeda-891ff6d92ace
+
+		changedProperty = IsHidden
+
+	measure 'Total Revenue' = ```
+			
+			SUMX(
+			    'Sales Data',
+			    'Sales Data'[OrderQuantity] * 
+			    RELATED(
+			        'Product Lookup'[ProductPrice]
+			    )
+			)
+			```
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: a301f2cf-2e43-4956-8111-9871445a9a16
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Average Revenue per Customer' =
+			
+			DIVIDE(
+			    [Total Revenue],
+			    [Total Customers]
+			)
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: add24fb7-1714-4555-8fd8-7d36fb64ce0e
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Total cost' =
+			
+			SUMX(
+			    'Sales Data',
+			    'Sales Data'[OrderQuantity]
+			    *
+			    RELATED(
+			        'Product Lookup'[ProductCost]
+			    )
+			)
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 23bb476b-2b35-48f9-946d-50c4d590371e
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Total Profit' = ```
+			
+			 [Total Revenue] - [Total cost]
+			```
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 2a364d23-bf79-4f78-bc93-ffe0f45dc220
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'YTD Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATESYTD(
+			        'Calendar Lookup'[Date]
+			    )
+			)
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 04670e66-cc5f-4c12-8c18-0c42c1ff251b
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Previous Month Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATEADD(
+			        'Calendar Lookup'[Date],
+			        -1,
+			        MONTH
+			    )
+			)
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: ea5c4efc-d967-4db1-9f4b-5fc37f372e1c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Revenue Target' =
+			
+			[Previous Month Revenue] * 1.1
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 8a7c7308-7e05-45ba-9dc8-2d90df4f239b
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure '10 day Rolling Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATESINPERIOD(
+			        'Calendar Lookup'[Date],
+			        MAX(
+			            'Calendar Lookup'[Date]
+			        ),
+			        -10,
+			        DAY
+			    )
+			)
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 60f14c4c-2be1-446e-abda-2140f96ed341
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Previous Month Returns' =
+			
+			CALCULATE(
+			    [Total Returns],
+			    DATEADD(
+			        'Calendar Lookup'[Date],
+			        -1,
+			        MONTH
+			    ))
+		formatString: #,0
+		lineageTag: 5676c1fe-53da-48e6-8902-26bde7dc21ed
+
+	measure 'Previous Month Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    DATEADD(
+			        'Calendar Lookup'[Date],
+			        -1,
+			        MONTH
+			    ))
+		formatString: 0
+		lineageTag: c56676ae-2f82-4a41-8be5-6c45aff88fa3
+
+	measure 'Previous Month Profit' =
+			
+			CALCULATE(
+			    [Total Profit],
+			    DATEADD(
+			        'Calendar Lookup'[Date],
+			        -1,
+			        MONTH
+			    ))
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 5507a8d5-7738-459b-a204-97405a3bf5c1
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Order Target' =
+			
+			[Previous Month Orders] * 1.1
+		formatString: #,0
+		lineageTag: 6b2781f9-c525-4072-8683-fd0faaa62e06
+
+	measure 'Profit Target' =
+			
+			[Previous Month Profit] * 1.1
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 763fba9f-e94f-40d8-9064-fe01b05abd24
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure '90 Day Rolling Profit' = ```
+			
+			CALCULATE(
+			    [Total Profit],
+			    DATESINPERIOD(
+			        'Calendar Lookup'[Date], 
+			        MAX(
+			            'Calendar Lookup'[Date]
+			        ),
+			        -90,
+			        DAY
+			    )
+			)
+			
+			```
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 0049fd90-fe3c-4807-8145-bd8425078c90
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Total Orders (Customer Detail)' =
+			
+			IF(
+			    HASONEVALUE(
+			        'Customer Lookup'[CustomerKey]
+			    ),
+			    [Total Orders],
+			    "-"
+			)
+		lineageTag: 3adc95f5-889a-45fa-b3e6-1a1c9e01dc7f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Revenue (Customer Detail)' =
+			
+			IF(
+			    HASONEVALUE(
+			        'Customer Lookup'[CustomerKey]
+			    ),
+			    [Total Revenue],
+			    "-"
+			)
+		lineageTag: 2be48e4c-34ae-4bce-9e42-11ec612bc192
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Order Target Gap' =
+			
+			[Total Orders] - [Order Target]
+		lineageTag: 79bd38bb-93b4-453e-a0db-b444455bd01c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue Target Gap' =
+			
+			[Total Revenue] - [Revenue Target]
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: d8023d72-4bc3-46b6-b2e7-17f52e221da0
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Profit Target Gap' =
+			
+			[Total Profit] - [Profit Target]
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: f3ec1253-9ac5-45e6-8248-78f83f8d08b2
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Adjusted Price' =
+			
+			[Average Retail Price] * (1 + 'Price Adjustment (%)'[Price Adjustment (%) Value])
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: ce0f5f2f-5155-467c-ac97-010bf2b210a9
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Adjusted Revenue' = ```
+			
+			SUMX(
+			    'Sales Data',
+			    'Sales Data'[OrderQuantity] 
+			    *
+			    [Adjusted Price]
+			    )
+			```
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: 481ccf3e-37e0-429f-be45-b376bd21936a
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	measure 'Adjusted Profit' = ```
+			
+			 [Adjusted Revenue] - [Total cost]
+			```
+		formatString: "₹"\ #,0.###############;#,0.###############\ -"₹";"₹"\ #,0.###############
+		lineageTag: b1f555b5-eb51-4e9d-82c3-bee8673d8b6c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	partition 'Measure Table' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

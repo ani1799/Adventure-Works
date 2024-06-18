@@ -1,0 +1,30 @@
+table 'Price Adjustment (%)'
+	lineageTag: 8110ae77-3757-4c1b-b715-732bf6aacb3c
+
+	measure 'Price Adjustment (%) Value' = SELECTEDVALUE('Price Adjustment (%)'[Price Adjustment (%)], 0)
+		lineageTag: 2b066b81-ac08-4d3d-9487-59d1e6d2bb96
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Price Adjustment (%)'
+		dataType: double
+		lineageTag: 1b67be1d-e740-441c-b032-ae3a105a394b
+		summarizeBy: none
+		isDataTypeInferred
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'Price Adjustment (%)' = calculated
+		mode: import
+		source = GENERATESERIES(-1, 1, 0.1)
+
+	annotation PBI_Id = a9b0c704c2224931a20da9343ef820c0
+
